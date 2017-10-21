@@ -14,6 +14,8 @@ from Qt import QtCore, QtGui, QtWidgets
 
 from dialogs.login import LoginDialog
 
+from widgets.calendar import CalendarWidget
+
 
 class MainWindow(QtWidgets.QMainWindow):
     """docstring for ClassName"""
@@ -38,9 +40,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.menubar = self.menuBar()
         self.menubar.setFont(self.main_font)
-        self.node_menu = self.menubar.addMenu('Project')
+        self.node_menu = self.menubar.addMenu('Login/Project')
         self.node_menu.setFont(self.main_font)
         self.node_menu.addAction('Login', self.login)
+        self.node_menu.addSeparator()
         self.node_menu.addAction('New')
         self.node_menu.addAction('Change Project')
 
@@ -86,6 +89,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.nodz.initialize()
         self.second_layout.addWidget(self.nodz)
 
+        calendar = CalendarWidget()
+        self.second_layout.addWidget(calendar)
+
         self.footer_layout = QtWidgets.QHBoxLayout(self.widget)
         self.main_layout.addLayout(self.footer_layout)
 
@@ -124,7 +130,7 @@ class MainWindow(QtWidgets.QMainWindow):
         d.current_user_signal.connect(self.update_login)
 
     def update_login(self, login):
-        
+
         self.current_user = login
 
 if __name__ == "__main__":
