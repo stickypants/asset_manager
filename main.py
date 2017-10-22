@@ -34,7 +34,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.selected_node = ''
 
         self.main_font = QtGui.QFont()
-        self.main_font.setPointSize(10)
+        self.main_font.setPointSize(12)
         self.main_font.setFamily("Arial")
 
         self.infos_font = QtGui.QFont()
@@ -57,10 +57,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.node_menu.addAction('Change Project', self.change_project)
 
         self.node_menu = self.menubar.addMenu('Graph')
+        self.node_menu.setFont(self.main_font)
         self.node_menu.addAction('Save Graph', self.save_current_graph)
         self.node_menu.addAction('Load Graph', self.load_previous_graph)
 
         self.node_menu = self.menubar.addMenu('Entity Nodes')
+        self.node_menu.setFont(self.main_font)
         self.node_menu.addAction('Character')
         self.node_menu.addAction('Props')
         self.node_menu.addAction('Set')
@@ -72,6 +74,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.node_menu.addAction('File')
 
         self.task_menu = self.menubar.addMenu('Taks Nodes')
+        self.task_menu.setFont(self.main_font)
         self.task_menu.addAction('Modeling')
         self.task_menu.addAction('Rigging')
         self.task_menu.addAction('Groom')
@@ -86,6 +89,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.task_menu.addAction('Compositing')
 
         self.utility_menu = self.menubar.addMenu('Utility Nodes')
+        self.node_menu.setFont(self.main_font)
 
         self.main_layout = QtWidgets.QVBoxLayout(self.widget)
         self.main_layout.setContentsMargins(10, 10, 10, 10)
@@ -105,6 +109,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.graph = AnalyticsWidget()
 
         self.tab = QtWidgets.QTabWidget()
+        self.tab.setFont(self.main_font)
         self.tab.setTabShape(QtWidgets.QTabWidget.Triangular)
 
         self.tab.addTab(self.infos, "Infos")
@@ -180,6 +185,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def update_selected_node_infos(self, current_node):
 
         self.selected_node = current_node
+        self.graph.create_graph(self.selected_node)
 
         if len(self.selected_node) != 0:
             node_name = "'{}'".format(self.selected_node[0])
@@ -192,6 +198,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.infos.type.setText(data[0][1])
             self.infos.author.setText(data[0][2])
             self.infos.date.setText(data[0][3])
+
         else:
             self.infos.name.setText('')
             self.infos.type.setText('')

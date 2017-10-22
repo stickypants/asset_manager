@@ -19,7 +19,7 @@ class CalendarWidget(QtWidgets.QWidget):
         super(CalendarWidget, self).__init__()
 
         self.main_font = QtGui.QFont()
-        self.main_font.setPointSize(10)
+        self.main_font.setPointSize(12)
         self.main_font.setFamily("Arial")
 
         self.main_layout = QtWidgets.QVBoxLayout(self)

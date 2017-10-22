@@ -23,7 +23,7 @@ class ChooseProjectDialogs(QtWidgets.QDialog):
         self.setFixedSize(250, 180)
 
         main_font = QtGui.QFont()
-        main_font.setPointSize(10)
+        main_font.setPointSize(12)
         main_font.setFamily("Arial")
 
         dialogs_layout = QtWidgets.QVBoxLayout()
@@ -91,7 +91,7 @@ class NewProjectDialogs(QtWidgets.QDialog):
         self.setFixedSize(250, 180)
 
         main_font = QtGui.QFont()
-        main_font.setPointSize(10)
+        main_font.setPointSize(12)
         main_font.setFamily("Arial")
 
         dialogs_layout = QtWidgets.QVBoxLayout()
