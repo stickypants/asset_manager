@@ -57,8 +57,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.node_menu.addAction('Change Project', self.change_project)
 
         self.node_menu = self.menubar.addMenu('Graph')
-        self.node_menu.addAction('Save Graph')
-        self.node_menu.addAction('Load Graph')
+        self.node_menu.addAction('Save Graph', self.save_current_graph)
+        self.node_menu.addAction('Load Graph', self.load_previous_graph)
 
         self.node_menu = self.menubar.addMenu('Entity Nodes')
         self.node_menu.addAction('Character')
@@ -197,6 +197,12 @@ class MainWindow(QtWidgets.QMainWindow):
             self.infos.type.setText('')
             self.infos.author.setText('')
             self.infos.date.setText('')
+
+    def save_current_graph(self):
+        self.nodz.saveGraph("C:\Users\jucha\Documents\@git\saved_graph.json")
+
+    def load_previous_graph(self):
+        self.nodz.loadGraph("C:\Users\jucha\Documents\@git\saved_graph.json")
 
 if __name__ == "__main__":
 
