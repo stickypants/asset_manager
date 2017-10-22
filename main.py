@@ -10,13 +10,18 @@ __author__ = "Julien Chastaing"
 
 import sys
 import nodz_main
+
 from Qt import QtCore, QtGui, QtWidgets
+
+from db.queries import DatabaseQueries
 
 from dialogs.login import LoginDialogs
 from dialogs.project import NewProjectDialogs, ChooseProjectDialogs
+from dialogs.search_bar import SearchBarDialogs
 
 from widgets.calendar import CalendarWidget
 from widgets.infos import InfoWidget
+from widgets.graph import AnalyticsWidget
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -26,6 +31,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.current_user = ''
         self.current_project = ''
+        self.selected_node = ''
 
         self.main_font = QtGui.QFont()
         self.main_font.setPointSize(10)
@@ -90,16 +96,20 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.nodz = nodz_main.Nodz(None)
         self.nodz.initialize()
+        self.nodz.signal_NodeSelected.connect(self.update_selected_node_infos)
+        self.nodz.signal_KeyPressed.connect(self.key_event)
         self.second_layout.addWidget(self.nodz)
 
         self.calendar = CalendarWidget()
         self.infos = InfoWidget()
+        self.graph = AnalyticsWidget()
 
         self.tab = QtWidgets.QTabWidget()
         self.tab.setTabShape(QtWidgets.QTabWidget.Triangular)
 
         self.tab.addTab(self.infos, "Infos")
         self.tab.addTab(self.calendar, "Calendar")
+        self.tab.addTab(self.graph, "Graphs")
 
         self.second_layout.addWidget(self.tab)
 
@@ -161,6 +171,32 @@ class MainWindow(QtWidgets.QMainWindow):
         self.current_project = project
         self.infos.project.setText(project)
 
+    def key_event(self, event):
+
+        if event == 32:  # spacebar
+            d = SearchBarDialogs(self.nodz, self.current_project, self.widget)
+            d.show()
+
+    def update_selected_node_infos(self, current_node):
+
+        self.selected_node = current_node
+
+        if len(self.selected_node) != 0:
+            node_name = "'{}'".format(self.selected_node[0])
+            db = DatabaseQueries()
+
+            db.cursor.execute("SELECT * FROM assets WHERE name = {}".format(node_name))
+            data = db.cursor.fetchall()
+
+            self.infos.name.setText(data[0][0])
+            self.infos.type.setText(data[0][1])
+            self.infos.author.setText(data[0][2])
+            self.infos.date.setText(data[0][3])
+        else:
+            self.infos.name.setText('')
+            self.infos.type.setText('')
+            self.infos.author.setText('')
+            self.infos.date.setText('')
 
 if __name__ == "__main__":
 
