@@ -12,9 +12,11 @@ import sys
 import nodz_main
 from Qt import QtCore, QtGui, QtWidgets
 
-from dialogs.login import LoginDialog
+from dialogs.login import LoginDialogs
+from dialogs.project import NewProjectDialogs, ChooseProjectDialogs
 
 from widgets.calendar import CalendarWidget
+from widgets.infos import InfoWidget
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -23,6 +25,7 @@ class MainWindow(QtWidgets.QMainWindow):
         super(MainWindow, self).__init__(parent)
 
         self.current_user = ''
+        self.current_project = ''
 
         self.main_font = QtGui.QFont()
         self.main_font.setPointSize(10)
@@ -44,8 +47,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.node_menu.setFont(self.main_font)
         self.node_menu.addAction('Login', self.login)
         self.node_menu.addSeparator()
-        self.node_menu.addAction('New')
-        self.node_menu.addAction('Change Project')
+        self.node_menu.addAction('New', self.new_project)
+        self.node_menu.addAction('Change Project', self.change_project)
 
         self.node_menu = self.menubar.addMenu('Graph')
         self.node_menu.addAction('Save Graph')
@@ -89,8 +92,16 @@ class MainWindow(QtWidgets.QMainWindow):
         self.nodz.initialize()
         self.second_layout.addWidget(self.nodz)
 
-        calendar = CalendarWidget()
-        self.second_layout.addWidget(calendar)
+        self.calendar = CalendarWidget()
+        self.infos = InfoWidget()
+
+        self.tab = QtWidgets.QTabWidget()
+        self.tab.setTabShape(QtWidgets.QTabWidget.Triangular)
+
+        self.tab.addTab(self.infos, "Infos")
+        self.tab.addTab(self.calendar, "Calendar")
+
+        self.second_layout.addWidget(self.tab)
 
         self.footer_layout = QtWidgets.QHBoxLayout(self.widget)
         self.main_layout.addLayout(self.footer_layout)
@@ -125,13 +136,31 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def login(self):
 
-        d = LoginDialog(self.widget)
+        d = LoginDialogs(self.widget)
         d.show()
         d.current_user_signal.connect(self.update_login)
 
     def update_login(self, login):
 
         self.current_user = login
+        self.infos.login.setText(login)
+
+    def new_project(self):
+
+        d = NewProjectDialogs(self.widget)
+        d.show()
+
+    def change_project(self):
+
+        d = ChooseProjectDialogs(self.widget)
+        d.show()
+        d.current_project_signal.connect(self.update_project)
+
+    def update_project(self, project):
+
+        self.current_project = project
+        self.infos.project.setText(project)
+
 
 if __name__ == "__main__":
 
