@@ -938,35 +938,31 @@ QTreeView:branch:selected, QTreeView:branch:hover
 }
 
 QTreeView::branch:has-siblings:!adjoins-item {
-    border-image: url(:/qss_icons/rc/transparent.png);
-}
-
-QTreeView::branch:has-siblings:adjoins-item {
-    border-image: url(:/qss_icons/rc/transparent.png);
+    border-image: url(C:/Users/jucha/Documents/@git/icons/vline.png) 0;
 }
 
 QTreeView::branch:!has-children:!has-siblings:adjoins-item {
-    border-image: url(:/qss_icons/rc/transparent.png);
+    border-image: url(C:/Users/jucha/Documents/@git/icons/branch-end.png) 0;
 }
 
 QTreeView::branch:has-children:!has-siblings:closed,
 QTreeView::branch:closed:has-children:has-siblings {
-    image: url(:/qss_icons/rc/branch_closed.png);
+    image: url(C:/Users/jucha/Documents/@git/icons/branch-closed.png);
 }
 
 QTreeView::branch:open:has-children:!has-siblings,
 QTreeView::branch:open:has-children:has-siblings  {
-    image: url(:/qss_icons/rc/branch_open.png);
+    image: url(C:/Users/jucha/Documents/@git/icons/branch-open.png);
 }
 
 QTreeView::branch:has-children:!has-siblings:closed:hover,
 QTreeView::branch:closed:has-children:has-siblings:hover {
-    image: url(:/qss_icons/rc/branch_closed-on.png);
+    image: url(C:/Users/jucha/Documents/@git/icons/branch-closed_h.png);
     }
 
 QTreeView::branch:open:has-children:!has-siblings:hover,
 QTreeView::branch:open:has-children:has-siblings:hover  {
-    image: url(:/qss_icons/rc/branch_open-on.png);
+    image: url(C:/Users/jucha/Documents/@git/icons/branch-open_h.png);
     }
 
 QListView::item:!selected:hover, QTreeView::item:!selected:hover  {

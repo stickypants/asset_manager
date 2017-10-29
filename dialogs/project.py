@@ -9,6 +9,7 @@ __author__ = "Julien Chastaing"
 
 from Qt import QtGui, QtWidgets, QtCore
 from db.queries import DatabaseQueries
+import os
 
 
 class ChooseProjectDialogs(QtWidgets.QDialog):
@@ -118,19 +119,10 @@ class NewProjectDialogs(QtWidgets.QDialog):
         self.name.setFont(main_font)
         dialogs_layout.addWidget(self.name)
 
-        path_name = QtWidgets.QLabel("Path")
-        path_name.setFont(main_font)
-        path_name.setAlignment(QtCore.Qt.AlignLeft)
-        dialogs_layout.addWidget(path_name)
-
-        self.path = QtWidgets.QLineEdit()
-        self.path.setFont(main_font)
-        dialogs_layout.addWidget(self.path)
-
         dialog_btn_layout = QtWidgets.QHBoxLayout(self)
         dialogs_layout.addLayout(dialog_btn_layout)
 
-        ok_btn = QtWidgets.QPushButton("OK")
+        ok_btn = QtWidgets.QPushButton("Create")
         ok_btn.setFont(main_font)
         ok_btn.clicked.connect(self.create_project)
         dialog_btn_layout.addWidget(ok_btn)
@@ -142,10 +134,26 @@ class NewProjectDialogs(QtWidgets.QDialog):
 
     def create_project(self):
 
+        dialog = QtWidgets.QFileDialog()
         self.current_name = self.name.text()
-        self.current_path = self.path.text()
+        folder_path = dialog.getExistingDirectory(None, "")
+        project_path = folder_path + '/' + self.current_name
+
+        os.mkdir(project_path)
+
+        os.mkdir(project_path + '/character')
+        os.mkdir(project_path + '/props')
+        os.mkdir(project_path + '/set')
+
+        os.mkdir(project_path + '/sequence')
+        os.mkdir(project_path + '/shot')
+
+        os.mkdir(project_path + '/file')
+
+        db_path = "'{}'".format(project_path)
+        db_name = "'{}'".format(self.current_name)
 
         db = DatabaseQueries()
-        db.cursor.execute("INSERT project (name, root_path) VALUES ({}, {})".format(self.current_name, self.current_path))
+        db.cursor.execute("INSERT INTO projects (name, root_path) VALUES ({}, {})".format(db_name, db_path))
 
         self.close()
