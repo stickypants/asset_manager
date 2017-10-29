@@ -110,7 +110,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.calendar = CalendarWidget()
         self.infos = InfoWidget()
         self.graph = AnalyticsWidget()
-        self.tree = TreeWidget()
+        self.tree = TreeWidget(self.nodz)
 
         self.tab = QtWidgets.QTabWidget()
         self.tab.setFont(self.main_font)

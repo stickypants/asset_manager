@@ -63,16 +63,8 @@ class SearchBarDialogs(QtWidgets.QDialog):
 
         node = self.nodz.createNode(name=self.current_name, preset='node_preset_1', position=None)
 
-        if self.type == 'set':
-            self.nodz.createAttribute(node=node, name='Input', index=-1, preset='attr_preset_1',
-                                      plug=False, socket=True, dataType=str)
-        if self.type == 'shot':
-
-            self.nodz.createAttribute(node=node, name='Input', index=-1, preset='attr_preset_1',
-                                      plug=False, socket=True, dataType=str)
-               
-            self.nodz.createAttribute(node=node, name='Cam', index=-1, preset='attr_preset_1',
-                                      plug=False, socket=True, dataType=str)
+        self.nodz.createAttribute(node=node, name='Input', index=-1, preset='attr_preset_1',
+                                  plug=False, socket=True, dataType=str)
 
         self.nodz.createAttribute(node=node, name='Output', index=-1, preset='attr_preset_1',
                                   plug=True, socket=False, dataType=str)

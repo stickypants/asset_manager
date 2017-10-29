@@ -17,11 +17,10 @@ __author__ = "Julien Chastaing"
 class TreeWidget(QtWidgets.QWidget):
     """docstring for ClassName"""
 
-    current_project_signal = QtCore.Signal(str)
-
-    def __init__(self):
+    def __init__(self, nodz):
         super(TreeWidget, self).__init__()
 
+        self.nodz = nodz
         self.project_name = ""
 
         self.main_font = QtGui.QFont()
@@ -45,6 +44,7 @@ class TreeWidget(QtWidgets.QWidget):
         self.tree = QtWidgets.QTreeWidget()
         self.tree.setHeaderHidden(True)
         self.tree.setFont(self.main_font)
+        self.tree.itemDoubleClicked.connect(self.create_node)
         main_layout.addWidget(self.tree)
 
         sperator = QtWidgets.QFrame()
@@ -123,6 +123,18 @@ class TreeWidget(QtWidgets.QWidget):
                     asset_item.addChild(task_item)
 
         self.tree.expandAll()
+
+    def create_node(self, item_name):
+
+        node_name = item_name.text(0)
+
+        node = self.nodz.createNode(name=node_name, preset='node_preset_1', position=None)
+
+        self.nodz.createAttribute(node=node, name='Input', index=-1, preset='attr_preset_1',
+                                  plug=False, socket=True, dataType=str)
+
+        self.nodz.createAttribute(node=node, name='Output', index=-1, preset='attr_preset_1',
+                                  plug=True, socket=False, dataType=str)
 
 if __name__ == '__main__':
 
