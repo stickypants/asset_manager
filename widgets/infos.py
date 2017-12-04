@@ -87,7 +87,31 @@ class InfoWidget(QtWidgets.QWidget):
         self.date.setAlignment(QtCore.Qt.AlignLeft)
         self.main_layout.addWidget(self.date)
 
-        self.comments = QtWidgets.QTextEdit()
-        self.comments.setFont(self.main_font)
-        self.comments.setReadOnly(True)
-        self.main_layout.addWidget(self.comments)
+        sperator = QtWidgets.QFrame()
+        sperator.setFrameStyle(QtWidgets.QFrame.HLine | QtWidgets.QFrame.Plain)
+        sperator.setFixedHeight(1)
+        self.main_layout.addWidget(sperator)
+
+        self.task_label = QtWidgets.QLabel("Task Status")
+        self.task_label.setFont(self.main_font)
+        self.task_label.setAlignment(QtCore.Qt.AlignLeft)
+        self.main_layout.addWidget(self.task_label)
+
+        self.status_combox = QtWidgets.QComboBox()
+        self.status_combox.setFont(self.main_font)
+        self.main_layout.addWidget(self.status_combox)
+
+        status_list = ['wts', 'ip', 'rev', 'rtk', 'fin']
+        status_name = ['Waiting to Start', 'In Progress', 'To Review', 'Retake', 'Ok']
+
+        for i, status in enumerate(status_list):
+            self.status_combox.addItem(QtGui.QIcon("C:/Users/jucha/Documents/@git/icons/{}.png".format(status)), status_name[i])
+
+        self.version_label = QtWidgets.QLabel("Versions")
+        self.version_label.setFont(self.main_font)
+        self.version_label.setAlignment(QtCore.Qt.AlignLeft)
+        self.main_layout.addWidget(self.version_label)
+
+        self.version_combox = QtWidgets.QComboBox()
+        self.version_combox.setFont(self.main_font)
+        self.main_layout.addWidget(self.version_combox)

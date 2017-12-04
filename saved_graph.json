@@ -1,74 +1,36 @@
 {
     "CONNECTIONS": [
         [
-            "sh_001.Output", 
-            "sh_001_render.Input"
+            "[T] props_002_modeling.Output", 
+            "[F] props_002_modeling_001 | ma.Input"
         ], 
         [
-            "cam_001.Output", 
-            "sh_001.Cam"
+            "[T] props_002_modeling.Output", 
+            "[F] props_002_modeling_001 | blend.Input"
         ], 
         [
-            "props_002_modeling.Output", 
-            "set_001.Input"
+            "[E] props_002.Output", 
+            "[T] props_002_lookdev.Input"
         ], 
         [
-            "set_001.Output", 
-            "sh_001.Input"
+            "[E] props_002.Output", 
+            "[T] props_002_groom.Input"
         ], 
         [
-            "props_002.Output", 
-            "props_002_modeling.Input"
+            "[E] props_002.Output", 
+            "[T] props_002_rigging.Input"
         ], 
         [
-            "props_001.Output", 
-            "props_001_modeling.Input"
+            "[T] props_002_modeling.Output", 
+            "[F] props_002_modeling_001 | png.Input"
         ], 
         [
-            "character_001.Output", 
-            "character_001_rigging.Input"
-        ], 
-        [
-            "character_001.Output", 
-            "character_001_modeling.Input"
+            "[E] props_002.Output", 
+            "[T] props_002_modeling.Input"
         ]
     ], 
     "NODES": {
-        "cam_001": {
-            "alternate": true, 
-            "attributes": [
-                {
-                    "dataType": "<type 'str'>", 
-                    "name": "Output", 
-                    "plug": true, 
-                    "preset": "attr_preset_1", 
-                    "socket": false
-                }
-            ], 
-            "position": [
-                920.5071249999995, 
-                1239.1801249999992
-            ], 
-            "preset": "node_preset_1"
-        }, 
-        "character_001": {
-            "alternate": true, 
-            "attributes": [
-                {
-                    "dataType": "<type 'str'>", 
-                    "name": "Output", 
-                    "plug": true, 
-                    "preset": "attr_preset_1", 
-                    "socket": false
-                }
-            ], 
-            "position": [
-                -3.8256687499997497, 
-                739.32850625
-            ], 
-            "preset": "node_preset_1"
-        }, 
-        "character_001_modeling": {
+        "[E] props_002": {
             "alternate": true, 
             "attributes": [
                 {
@@ -87,12 +49,12 @@
                 }
             ], 
             "position": [
-                421.5083312500003, 
-                667.2450062500002
+                86.2508018867926, 
+                1005.6562735849054
             ], 
             "preset": "node_preset_1"
         }, 
-        "character_001_rigging": {
+        "[F] props_002_modeling_001 | blend": {
             "alternate": true, 
             "attributes": [
                 {
@@ -111,29 +73,12 @@
                 }
             ], 
             "position": [
-                421.5083312500003, 
-                817.2450062500002
+                771.8019811320748, 
+                909.157735849056
             ], 
-            "preset": "node_preset_1"
+            "preset": "node_preset_2"
         }, 
-        "props_001": {
-            "alternate": true, 
-            "attributes": [
-                {
-                    "dataType": "<type 'str'>", 
-                    "name": "Output", 
-                    "plug": true, 
-                    "preset": "attr_preset_1", 
-                    "socket": false
-                }
-            ], 
-            "position": [
-                -22.82566874999975, 
-                1023.32850625
-            ], 
-            "preset": "node_preset_1"
-        }, 
-        "props_001_modeling": {
+        "[F] props_002_modeling_001 | ma": {
             "alternate": true, 
             "attributes": [
                 {
@@ -152,29 +97,12 @@
                 }
             ], 
             "position": [
-                402.17433125000025, 
-                994.32850625
+                778.5392452830183, 
+                1061.4199056603768
             ], 
-            "preset": "node_preset_1"
+            "preset": "node_preset_2"
         }, 
-        "props_002": {
-            "alternate": true, 
-            "attributes": [
-                {
-                    "dataType": "<type 'str'>", 
-                    "name": "Output", 
-                    "plug": true, 
-                    "preset": "attr_preset_1", 
-                    "socket": false
-                }
-            ], 
-            "position": [
-                -22.82566874999975, 
-                1193.32850625
-            ], 
-            "preset": "node_preset_1"
-        }, 
-        "props_002_modeling": {
+        "[F] props_002_modeling_001 | png": {
             "alternate": true, 
             "attributes": [
                 {
@@ -193,12 +121,12 @@
                 }
             ], 
             "position": [
-                408.17433125000025, 
-                1205.32850625
+                772.7125471698116, 
+                755.193867924528
             ], 
-            "preset": "node_preset_1"
+            "preset": "node_preset_2"
         }, 
-        "set_001": {
+        "[T] props_002_groom": {
             "alternate": true, 
             "attributes": [
                 {
@@ -217,43 +145,12 @@
                 }
             ], 
             "position": [
-                900.7357499999996, 
-                1000.4027499999995
+                461.63830188679253, 
+                1206.1712735849057
             ], 
-            "preset": "node_preset_1"
+            "preset": "node_preset_3"
         }, 
-        "sh_001": {
-            "alternate": true, 
-            "attributes": [
-                {
-                    "dataType": "<type 'str'>", 
-                    "name": "Input", 
-                    "plug": false, 
-                    "preset": "attr_preset_1", 
-                    "socket": true
-                }, 
-                {
-                    "dataType": "<type 'str'>", 
-                    "name": "Cam", 
-                    "plug": false, 
-                    "preset": "attr_preset_1", 
-                    "socket": true
-                }, 
-                {
-                    "dataType": "<type 'str'>", 
-                    "name": "Output", 
-                    "plug": true, 
-                    "preset": "attr_preset_1", 
-                    "socket": false
-                }
-            ], 
-            "position": [
-                1363.0817499999994, 
-                900.0249999999992
-            ], 
-            "preset": "node_preset_1"
-        }, 
-        "sh_001_render": {
+        "[T] props_002_lookdev": {
             "alternate": true, 
             "attributes": [
                 {
@@ -272,10 +169,58 @@
                 }
             ], 
             "position": [
-                1787.4058749999997, 
-                953.2556249999996
+                468.2508018867927, 
+                1358.2587735849054
             ], 
-            "preset": "node_preset_1"
+            "preset": "node_preset_3"
+        }, 
+        "[T] props_002_modeling": {
+            "alternate": true, 
+            "attributes": [
+                {
+                    "dataType": "<type 'str'>", 
+                    "name": "Input", 
+                    "plug": false, 
+                    "preset": "attr_preset_1", 
+                    "socket": true
+                }, 
+                {
+                    "dataType": "<type 'str'>", 
+                    "name": "Output", 
+                    "plug": true, 
+                    "preset": "attr_preset_1", 
+                    "socket": false
+                }
+            ], 
+            "position": [
+                463.91070754717, 
+                842.6151415094339
+            ], 
+            "preset": "node_preset_3"
+        }, 
+        "[T] props_002_rigging": {
+            "alternate": true, 
+            "attributes": [
+                {
+                    "dataType": "<type 'str'>", 
+                    "name": "Input", 
+                    "plug": false, 
+                    "preset": "attr_preset_1", 
+                    "socket": true
+                }, 
+                {
+                    "dataType": "<type 'str'>", 
+                    "name": "Output", 
+                    "plug": true, 
+                    "preset": "attr_preset_1", 
+                    "socket": false
+                }
+            ], 
+            "position": [
+                463.8358490566038, 
+                1030.886273584906
+            ], 
+            "preset": "node_preset_3"
         }
     }
 }

@@ -19,7 +19,7 @@ from db.queries import DatabaseQueries
 from dialogs.login import LoginDialogs
 from dialogs.project import NewProjectDialogs, ChooseProjectDialogs
 from dialogs.search_bar import SearchBarDialogs
-from dialogs.entity import EntityDialogs
+from dialogs.entity import EntityDialogs, FileDialogs
 
 from widgets.calendar import CalendarWidget
 from widgets.infos import InfoWidget
@@ -74,9 +74,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.node_menu.addAction('Sequence', lambda: self.entity_menu_action('sequence', self.current_project, self.current_project_path))
         self.node_menu.addAction('Shot', lambda: self.entity_menu_action('shot', self.current_project, self.current_project_path))
         self.node_menu.addSeparator()
-        self.node_menu.addAction('File')
+        self.node_menu.addAction('File', lambda: self.file_menu_action('file'))
 
-        self.task_menu = self.menubar.addMenu('Taks Nodes')
+        self.task_menu = self.menubar.addMenu('Tasks Nodes')
         self.task_menu.setFont(self.main_font)
         self.task_menu.addAction('Modeling', lambda: self.create_new_task('modeling'))
         self.task_menu.addAction('Rigging', lambda: self.create_new_task('rigging'))
@@ -117,9 +117,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.tab.setTabShape(QtWidgets.QTabWidget.Triangular)
 
         self.tab.addTab(self.infos, "Infos")
+        self.tab.addTab(self.tree, "Library")
         self.tab.addTab(self.calendar, "Calendar")
         self.tab.addTab(self.graph, "Graphs")
-        self.tab.addTab(self.tree, "Library")
 
         self.second_layout.addWidget(self.tab)
 
@@ -200,29 +200,73 @@ class MainWindow(QtWidgets.QMainWindow):
     def update_selected_node_infos(self, current_node):
 
         self.selected_node = current_node
-        self.graph.create_graph(self.selected_node)
+        self.infos.name.setText(self.selected_node[0])
+        project_name = "'{}'".format(self.current_project)
 
-        if len(self.selected_node) != 0:
-            node_name = "'{}'".format(self.selected_node[0])
-            project_name = "'{}'".format(self.current_project)
+        if '[E] ' in self.selected_node[0]:
+
+            node_name = "'{}'".format(self.selected_node[0][4:])
+
+            self.infos.name.setStyleSheet("color: rgb(192, 57, 43);")
+
+            self.infos.type.setText('Entity Node')
+
             db = DatabaseQueries()
-
             db.cursor.execute("SELECT * FROM assets WHERE name = {} AND project = {}".format(node_name, project_name))
             data = db.cursor.fetchall()
 
-            self.infos.name.setText(data[0][0])
-            self.infos.type.setText(data[0][1])
-            self.infos.author.setText(data[0][2])
-            self.infos.date.setText(data[0][3])
-
             self.full_path.setText(data[0][4])
+
+        if '[T] ' in self.selected_node[0]:
+            self.infos.name.setStyleSheet("color: rgb(46, 204, 113);")
+
+            self.infos.type.setText('Task Node')
+            self.full_path.setText('')
+
+            node_name = "'{}'".format(self.selected_node[0][4:])
+
+            db = DatabaseQueries()
+            db.cursor.execute("SELECT * FROM tasks WHERE name = {} ".format(node_name))
+            data = db.cursor.fetchall()
+
+            self.full_path.setText(data[0][2])
+
+        if '[F] ' in self.selected_node[0]:
+            self.infos.name.setStyleSheet("color: rgb(52, 152, 219);")
+
+            self.infos.type.setText('File Node')
+            node_name = "'{}'".format(self.selected_node[0][4:])
+
+            db = DatabaseQueries()
+            db.cursor.execute("SELECT * FROM files WHERE name = {}".format(node_name))
+            data = db.cursor.fetchall()
+
+            self.full_path.setText(data[0][0])
+
+        '''if len(self.selected_node) >= 0:
+            try:
+                self.graph.create_graph(self.selected_node)
+
+
+                task_name = self.selected_node[0].split('_')
+                task_name = task_name[len(task_name) - 1]
+
+                db = DatabaseQueries()
+
+                db.cursor.execute("SELECT * FROM assets WHERE name = {} AND project = {}".format(node_name, project_name))
+                data = db.cursor.fetchall()
+
+                self.infos.name.setText(data[0][0])
+
+            except:
+                pass
 
         else:
             self.infos.name.setText('')
             self.infos.type.setText('')
             self.infos.author.setText('')
             self.infos.date.setText('')
-            self.full_path.setText('')
+            self.full_path.setText('')'''
 
     def save_current_graph(self):
         self.nodz.saveGraph("C:\Users\jucha\Documents\@git\saved_graph.json")
@@ -234,6 +278,10 @@ class MainWindow(QtWidgets.QMainWindow):
         d = EntityDialogs(self.nodz, entity_name, project, current_project_path)
         d.exec_
 
+    def file_menu_action(self, selected_node):
+        d = FileDialogs(self.nodz, self.selected_node)
+        d.exec_
+
     def open_folder_btn(self):
 
         path = str(self.full_path.text() + '/')
@@ -242,12 +290,17 @@ class MainWindow(QtWidgets.QMainWindow):
     def create_new_task(self, task_name):
 
         current_selection = self.infos.name.text()
+        path = self.full_path.text()
 
         name = current_selection + '_' + task_name
-        path = self.full_path.text()
-        os.mkdir(path + '/{}'.format(name))
+        task_path = path + '/{}'.format(name[4:])
+        os.mkdir(task_path)
 
-        node = self.nodz.createNode(name=name, preset='node_preset_1', position=None)
+        db_name = "'{}'".format(name[4:])
+        db_assets = "'{}'".format(current_selection[4:])
+        db_path = "'{}'".format(task_path)
+
+        node = self.nodz.createNode(name='[T] ' + name[4:], preset='node_preset_3', position=None)
 
         self.nodz.createAttribute(node=node, name='Input', index=-1, preset='attr_preset_1',
                                   plug=False, socket=True, dataType=str)
@@ -256,8 +309,7 @@ class MainWindow(QtWidgets.QMainWindow):
                                   plug=True, socket=False, dataType=str)
 
         db = DatabaseQueries()
-        current_selection = "'{}'".format(current_selection)
-        db.cursor.execute("UPDATE assets SET {} = True WHERE name = {} AND project = '{}';".format(task_name, current_selection, self.current_project))
+        db.cursor.execute("INSERT INTO tasks (name, assets, path) VALUES ({}, {}, {})".format(db_name, db_assets, db_path))
 
 
 if __name__ == "__main__":

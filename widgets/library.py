@@ -79,48 +79,25 @@ class TreeWidget(QtWidgets.QWidget):
             data = db.cursor.fetchall()
 
             for asset in data:
-                asset_item = QtWidgets.QTreeWidgetItem(['{}'.format(asset[0])])
+
+                asset_item = QtWidgets.QTreeWidgetItem(['{}'.format('[E] ' + asset[0])])
                 category_item.addChild(asset_item)
 
-                if asset[7] == True:
-                    task_item = QtWidgets.QTreeWidgetItem(['{}'.format(asset[0] + '_modeling')])
+                db = DatabaseQueries()
+                db.cursor.execute("SELECT * FROM tasks WHERE assets = '{}'".format(asset[0]))
+                task_data = db.cursor.fetchall()
+
+                for task in task_data:
+                    task_item = QtWidgets.QTreeWidgetItem(['{}'.format('[T] ' + task[0])])
                     asset_item.addChild(task_item)
 
-                if asset[8] == True:
-                    task_item = QtWidgets.QTreeWidgetItem(['{}'.format(asset[0] + '_rigging')])
-                    asset_item.addChild(task_item)
+                    db = DatabaseQueries()
+                    db.cursor.execute("SELECT * FROM files WHERE task = '{}'".format(task[0]))
+                    file_data = db.cursor.fetchall()
 
-                if asset[9] == True:
-                    task_item = QtWidgets.QTreeWidgetItem(['{}'.format(asset[0] + '_groom')])
-                    asset_item.addChild(task_item)
-
-                if asset[10] == True:
-                    task_item = QtWidgets.QTreeWidgetItem(['{}'.format(asset[0] + '_lookdev')])
-                    asset_item.addChild(task_item)
-
-                if asset[11] == True:
-                    task_item = QtWidgets.QTreeWidgetItem(['{}'.format(asset[0] + '_setdress')])
-                    asset_item.addChild(task_item)
-
-                if asset[12] == True:
-                    task_item = QtWidgets.QTreeWidgetItem(['{}'.format(asset[0] + '_lighting')])
-                    asset_item.addChild(task_item)
-
-                if asset[13] == True:
-                    task_item = QtWidgets.QTreeWidgetItem(['{}'.format(asset[0] + '_layout')])
-                    asset_item.addChild(task_item)
-
-                if asset[14] == True:
-                    task_item = QtWidgets.QTreeWidgetItem(['{}'.format(asset[0] + '_animation')])
-                    asset_item.addChild(task_item)
-
-                if asset[15] == True:
-                    task_item = QtWidgets.QTreeWidgetItem(['{}'.format(asset[0] + '_render')])
-                    asset_item.addChild(task_item)
-
-                if asset[16] == True:
-                    task_item = QtWidgets.QTreeWidgetItem(['{}'.format(asset[0] + '_compositing')])
-                    asset_item.addChild(task_item)
+                    for file in file_data:
+                        file_item = QtWidgets.QTreeWidgetItem(['{}'.format('[F] ' + file[1])])
+                        task_item.addChild(file_item)
 
         self.tree.expandAll()
 
@@ -128,13 +105,35 @@ class TreeWidget(QtWidgets.QWidget):
 
         node_name = item_name.text(0)
 
-        node = self.nodz.createNode(name=node_name, preset='node_preset_1', position=None)
+        if '[T] ' in node_name:
 
-        self.nodz.createAttribute(node=node, name='Input', index=-1, preset='attr_preset_1',
-                                  plug=False, socket=True, dataType=str)
+            node = self.nodz.createNode(name=node_name, preset='node_preset_3', position=None)
 
-        self.nodz.createAttribute(node=node, name='Output', index=-1, preset='attr_preset_1',
-                                  plug=True, socket=False, dataType=str)
+            self.nodz.createAttribute(node=node, name='Input', index=-1, preset='attr_preset_1',
+                                      plug=False, socket=True, dataType=str)
+
+            self.nodz.createAttribute(node=node, name='Output', index=-1, preset='attr_preset_1',
+                                      plug=True, socket=False, dataType=str)
+
+        if '[E] ' in node_name:
+
+            node = self.nodz.createNode(name=node_name, preset='node_preset_1', position=None)
+
+            self.nodz.createAttribute(node=node, name='Input', index=-1, preset='attr_preset_1',
+                                      plug=False, socket=True, dataType=str)
+
+            self.nodz.createAttribute(node=node, name='Output', index=-1, preset='attr_preset_1',
+                                      plug=True, socket=False, dataType=str)
+
+        if '[F] ' in node_name:
+
+            node = self.nodz.createNode(name=node_name, preset='node_preset_2', position=None)
+
+            self.nodz.createAttribute(node=node, name='Input', index=-1, preset='attr_preset_1',
+                                      plug=False, socket=True, dataType=str)
+
+            self.nodz.createAttribute(node=node, name='Output', index=-1, preset='attr_preset_1',
+                                      plug=True, socket=False, dataType=str)
 
 if __name__ == '__main__':
 
