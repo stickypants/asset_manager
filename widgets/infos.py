@@ -73,19 +73,14 @@ class InfoWidget(QtWidgets.QWidget):
         self.type.setAlignment(QtCore.Qt.AlignLeft)
         self.main_layout.addWidget(self.type)
 
-        self.author = QtWidgets.QLabel("")
-        self.author.setFont(self.main_font)
-        self.author.setStyleSheet(
-            "QLabel {color: #eff0f1}")
-        self.author.setAlignment(QtCore.Qt.AlignLeft)
-        self.main_layout.addWidget(self.author)
+        self.subgraph_btn = QtWidgets.QPushButton("View SubGraph")
+        self.subgraph_btn.setFont(self.main_font)
+        self.subgraph_btn.setEnabled(False)
+        self.main_layout.addWidget(self.subgraph_btn)
 
-        self.date = QtWidgets.QLabel("")
-        self.date.setFont(self.main_font)
-        self.date.setStyleSheet(
-            "QLabel {color: #eff0f1}")
-        self.date.setAlignment(QtCore.Qt.AlignLeft)
-        self.main_layout.addWidget(self.date)
+        self.previous_graph_btn = QtWidgets.QPushButton("Previous Graph")
+        self.previous_graph_btn.setFont(self.main_font)
+        self.main_layout.addWidget(self.previous_graph_btn)
 
         sperator = QtWidgets.QFrame()
         sperator.setFrameStyle(QtWidgets.QFrame.HLine | QtWidgets.QFrame.Plain)
@@ -106,12 +101,3 @@ class InfoWidget(QtWidgets.QWidget):
 
         for i, status in enumerate(status_list):
             self.status_combox.addItem(QtGui.QIcon("C:/Users/jucha/Documents/@git/icons/{}.png".format(status)), status_name[i])
-
-        self.version_label = QtWidgets.QLabel("Versions")
-        self.version_label.setFont(self.main_font)
-        self.version_label.setAlignment(QtCore.Qt.AlignLeft)
-        self.main_layout.addWidget(self.version_label)
-
-        self.version_combox = QtWidgets.QComboBox()
-        self.version_combox.setFont(self.main_font)
-        self.main_layout.addWidget(self.version_combox)

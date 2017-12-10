@@ -149,6 +149,8 @@ class NewProjectDialogs(QtWidgets.QDialog):
         os.mkdir(project_path + '/shot')
 
         os.mkdir(project_path + '/file')
+        os.mkdir(project_path + '/subgraph')
+        os.mkdir(project_path + '/graph_history')
 
         db_path = "'{}'".format(project_path)
         db_name = "'{}'".format(self.current_name)

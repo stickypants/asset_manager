@@ -11,15 +11,17 @@ __author__ = "Julien Chastaing"
 import sys
 import os
 import nodz_main
+import random
 
 from Qt import QtCore, QtGui, QtWidgets
 
+import pyscreenshot as ImageGrab
 from db.queries import DatabaseQueries
 
 from dialogs.login import LoginDialogs
 from dialogs.project import NewProjectDialogs, ChooseProjectDialogs
 from dialogs.search_bar import SearchBarDialogs
-from dialogs.entity import EntityDialogs, FileDialogs
+from dialogs.entity import EntityDialogs, FileDialogs, SubGraphDialogs
 
 from widgets.calendar import CalendarWidget
 from widgets.infos import InfoWidget
@@ -36,6 +38,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.current_project = ''
         self.selected_node = ''
         self.current_project_path = ''
+        self.graph_history = 0
 
         self.main_font = QtGui.QFont()
         self.main_font.setPointSize(12)
@@ -46,7 +49,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.infos_font.setFamily("Arial")
 
         self.setWindowTitle("PROTOTYPE PIPELINE TOOL 2017 | JULIEN CHASTAING")
-        self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
 
         self.widget = QtWidgets.QWidget()
         self.setCentralWidget(self.widget)
@@ -92,7 +94,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.task_menu.addAction('Compositing', lambda: self.create_new_task('compositing'))
 
         self.utility_menu = self.menubar.addMenu('Utility Nodes')
-        self.node_menu.setFont(self.main_font)
+        self.utility_menu.setFont(self.main_font)
+        self.utility_menu.addAction('Merge', self.create_merge_node)
+        self.utility_menu.addAction('SubGraph', lambda: self.subgraph_menu_action(self.current_project, self.current_project_path))
 
         self.main_layout = QtWidgets.QVBoxLayout(self.widget)
         self.main_layout.setContentsMargins(10, 10, 10, 10)
@@ -108,7 +112,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.second_layout.addWidget(self.nodz)
 
         self.calendar = CalendarWidget()
+
         self.infos = InfoWidget()
+        self.infos.subgraph_btn.clicked.connect(self.load_subgraph_data)
+        self.infos.previous_graph_btn.clicked.connect(self.load_previous_graph_data)
+        self.infos.snap_btn.clicked.connect(self.create_thumnails)
+
         self.graph = AnalyticsWidget()
         self.tree = TreeWidget(self.nodz)
 
@@ -131,27 +140,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self.full_path.setFont(self.main_font)
         self.footer_layout.addWidget(self.full_path)
 
-        self.opn_btn = QtWidgets.QPushButton()
-        self.pixmap = QtGui.QPixmap("C:\Users\jucha\Documents\@git\icons\play.png")
-        self.icon = QtGui.QIcon(self.pixmap)
-        self.opn_btn.setIcon(self.icon)
-        self.opn_btn.setFont(self.main_font)
-        self.footer_layout.addWidget(self.opn_btn)
-
         self.fld_btn = QtWidgets.QPushButton()
-        self.pixmap = QtGui.QPixmap("C:\Users\jucha\Documents\@git\icons\dossier.png")
+        self.pixmap = QtGui.QPixmap("C:\Users\jucha\Documents\@git\icons\play.png")
         self.icon = QtGui.QIcon(self.pixmap)
         self.fld_btn.setIcon(self.icon)
         self.fld_btn.setFont(self.main_font)
         self.fld_btn.clicked.connect(self.open_folder_btn)
         self.footer_layout.addWidget(self.fld_btn)
-
-        self.save_btn = QtWidgets.QPushButton()
-        self.pixmap = QtGui.QPixmap("C:\Users\jucha\Documents\@git\icons\save.png")
-        self.icon = QtGui.QIcon(self.pixmap)
-        self.save_btn.setIcon(self.icon)
-        self.save_btn.setFont(self.main_font)
-        self.footer_layout.addWidget(self.save_btn)
 
         self.show()
 
@@ -203,70 +198,72 @@ class MainWindow(QtWidgets.QMainWindow):
         self.infos.name.setText(self.selected_node[0])
         project_name = "'{}'".format(self.current_project)
 
-        if '[E] ' in self.selected_node[0]:
+        if len(self.selected_node) >= 0:
 
-            node_name = "'{}'".format(self.selected_node[0][4:])
+            self.infos.subgraph_btn.setEnabled(False)
+            self.infos.snap_btn.setEnabled(False)
 
-            self.infos.name.setStyleSheet("color: rgb(192, 57, 43);")
-
-            self.infos.type.setText('Entity Node')
-
-            db = DatabaseQueries()
-            db.cursor.execute("SELECT * FROM assets WHERE name = {} AND project = {}".format(node_name, project_name))
-            data = db.cursor.fetchall()
-
-            self.full_path.setText(data[0][4])
-
-        if '[T] ' in self.selected_node[0]:
-            self.infos.name.setStyleSheet("color: rgb(46, 204, 113);")
-
-            self.infos.type.setText('Task Node')
-            self.full_path.setText('')
-
-            node_name = "'{}'".format(self.selected_node[0][4:])
-
-            db = DatabaseQueries()
-            db.cursor.execute("SELECT * FROM tasks WHERE name = {} ".format(node_name))
-            data = db.cursor.fetchall()
-
-            self.full_path.setText(data[0][2])
-
-        if '[F] ' in self.selected_node[0]:
-            self.infos.name.setStyleSheet("color: rgb(52, 152, 219);")
-
-            self.infos.type.setText('File Node')
-            node_name = "'{}'".format(self.selected_node[0][4:])
-
-            db = DatabaseQueries()
-            db.cursor.execute("SELECT * FROM files WHERE name = {}".format(node_name))
-            data = db.cursor.fetchall()
-
-            self.full_path.setText(data[0][0])
-
-        '''if len(self.selected_node) >= 0:
-            try:
-                self.graph.create_graph(self.selected_node)
+            if '[E] ' in self.selected_node[0]:
 
 
-                task_name = self.selected_node[0].split('_')
-                task_name = task_name[len(task_name) - 1]
+                node_name = "'{}'".format(self.selected_node[0][4:])
+
+                self.infos.name.setStyleSheet("color: rgb(192, 57, 43);")
+
+                self.infos.type.setText('Entity Node')
 
                 db = DatabaseQueries()
-
                 db.cursor.execute("SELECT * FROM assets WHERE name = {} AND project = {}".format(node_name, project_name))
                 data = db.cursor.fetchall()
 
-                self.infos.name.setText(data[0][0])
+                self.full_path.setText(data[0][4])
 
-            except:
-                pass
+                pixmap = QtGui.QPixmap(data[0][5])
+                self.infos.snapshot_result_label.setPixmap(pixmap)
+                self.infos.snap_btn.setEnabled(True)
 
-        else:
-            self.infos.name.setText('')
-            self.infos.type.setText('')
-            self.infos.author.setText('')
-            self.infos.date.setText('')
-            self.full_path.setText('')'''
+            if '[T] ' in self.selected_node[0]:
+                self.infos.name.setStyleSheet("color: rgb(46, 204, 113);")
+
+                self.infos.type.setText('Task Node')
+                self.full_path.setText('')
+
+                node_name = "'{}'".format(self.selected_node[0][4:])
+
+                db = DatabaseQueries()
+                db.cursor.execute("SELECT * FROM tasks WHERE name = {} ".format(node_name))
+                data = db.cursor.fetchall()
+
+                self.full_path.setText(data[0][2])
+                self.infos.snap_btn.setEnabled(False)
+
+            if '[F] ' in self.selected_node[0]:
+                self.infos.snap_btn.setEnabled(True)
+
+                self.infos.name.setStyleSheet("color: rgb(52, 152, 219);")
+
+                self.infos.type.setText('File Node')
+                node_name = "'{}'".format(self.selected_node[0][4:])
+
+                db = DatabaseQueries()
+                db.cursor.execute("SELECT * FROM files WHERE name = {}".format(node_name))
+                data = db.cursor.fetchall()
+
+                self.full_path.setText(data[0][0])
+
+                pixmap = QtGui.QPixmap(data[0][4])
+                self.infos.snapshot_result_label.setPixmap(pixmap)
+
+            if '[M] ' in self.selected_node[0]:
+                self.infos.name.setStyleSheet("color: rgb(241, 196, 15);")
+                self.infos.type.setText('Merge Node')
+                self.infos.snap_btn.setEnabled(False)
+
+            if '[SG] ' in self.selected_node[0]:
+                self.infos.name.setStyleSheet("color: rgb(155, 89, 182);")
+                self.infos.type.setText('SubGraph Node')
+                self.infos.subgraph_btn.setEnabled(True)
+                self.infos.snap_btn.setEnabled(False)
 
     def save_current_graph(self):
         self.nodz.saveGraph("C:\Users\jucha\Documents\@git\saved_graph.json")
@@ -281,6 +278,75 @@ class MainWindow(QtWidgets.QMainWindow):
     def file_menu_action(self, selected_node):
         d = FileDialogs(self.nodz, self.selected_node)
         d.exec_
+
+    def subgraph_menu_action(self, project, current_project_path):
+        d = SubGraphDialogs(self.nodz, project, current_project_path)
+        d.exec_
+
+    def load_subgraph_data(self):
+
+        current_selection = self.selected_node[0][5:]
+
+        json_path = self.current_project_path + '/graph_history/graph_' + str(self.graph_history) + '.json'
+        self.nodz.saveGraph(json_path)
+
+        # graph history
+        self.graph_history = self.graph_history + 1
+        print self.graph_history
+
+        db = DatabaseQueries()
+        db.cursor.execute("SELECT * FROM subgraph WHERE name = '{}'".format(current_selection))
+        data = db.cursor.fetchall()
+
+        self.nodz.clearGraph()
+        self.nodz.loadGraph(data[0][2])
+
+    def load_previous_graph_data(self):
+
+        # graph history
+        self.graph_history = self.graph_history - 1
+        print self.graph_history
+
+        self.nodz.clearGraph()
+
+        json_path = self.current_project_path + '/graph_history/graph_' + str(self.graph_history) + '.json'
+        self.nodz.loadGraph(json_path)
+
+    def create_thumnails(self):
+
+        if '[E] ' in self.selected_node[0]:
+
+            selected_node = self.selected_node[0][4:]
+            selected_node_path = self.full_path.text()
+
+            thumbnails_path = selected_node_path + '/' + selected_node + '_thumnails.png'
+
+            img = ImageGrab.grab()
+            img.save(thumbnails_path, 'png')
+
+            db = DatabaseQueries()
+            db.cursor.execute("UPDATE assets SET thumnails_path = '{}' WHERE name = '{}'".format(thumbnails_path, selected_node))
+
+        if '[F] ' in self.selected_node[0]:
+
+            selected_node = self.selected_node[0][4:]
+
+            db = DatabaseQueries()
+            db.cursor.execute("SELECT * FROM files WHERE name = '{}'".format(selected_node))
+            data = db.cursor.fetchall()
+            filename = data[0][5]
+            selected_node_path = self.full_path.text().replace(filename, '')
+            thumbnails_node = filename.split('.')
+            thumbnails_path = selected_node_path + thumbnails_node[0] + '_thumnails.png'
+
+            img = ImageGrab.grab()
+            img.save(thumbnails_path, 'png')
+
+            db = DatabaseQueries()
+            db.cursor.execute("UPDATE files SET thumbnails_path = '{}' WHERE name = '{}'".format(thumbnails_path, selected_node))
+
+        pixmap = QtGui.QPixmap(thumbnails_path)
+        self.infos.snapshot_result_label.setPixmap(pixmap)
 
     def open_folder_btn(self):
 
@@ -311,6 +377,15 @@ class MainWindow(QtWidgets.QMainWindow):
         db = DatabaseQueries()
         db.cursor.execute("INSERT INTO tasks (name, assets, path) VALUES ({}, {}, {})".format(db_name, db_assets, db_path))
 
+    def create_merge_node(self):
+
+        node = self.nodz.createNode(name='[M] ' + str(random.randint(0, 500000)), preset='node_preset_4', position=None)
+        self.nodz.createAttribute(node=node, name='Input A', index=-1, preset='attr_preset_1',
+                                  plug=False, socket=True, dataType=str)
+        self.nodz.createAttribute(node=node, name='Input B', index=-1, preset='attr_preset_1',
+                                  plug=False, socket=True, dataType=str)
+        self.nodz.createAttribute(node=node, name='Output', index=-1, preset='attr_preset_1',
+                                  plug=True, socket=False, dataType=str)
 
 if __name__ == "__main__":
 

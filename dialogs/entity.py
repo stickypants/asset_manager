@@ -201,7 +201,8 @@ class FileDialogs(QtWidgets.QDialog):
         db = DatabaseQueries()
         db.cursor.execute("SELECT * FROM tasks WHERE name = {} ".format("'" + node_name + "'"))
         data = db.cursor.fetchall()
-        output_path = data[0][2] + '/' + file_name[len(file_name) - 1]
+        output_path = data[0][2] + '/' + self.name.text() + '.' + self.file_type_cb.currentText()
+        print output_path
 
         shutil.copyfile(file_path, output_path)
 
@@ -209,6 +210,7 @@ class FileDialogs(QtWidgets.QDialog):
         db_path = "'{}'".format(output_path)
         db_extension = "'{}'".format(self.file_type_cb.currentText())
         db_task = "'{}'".format(self.selected_node[0][4:])
+        db_filename = "'{}'".format(self.name.text() + '.' + self.file_type_cb.currentText())
 
         node = self.nodz.createNode(name='[F] ' + self.current_name, preset='node_preset_2', position=None)
 
@@ -219,6 +221,81 @@ class FileDialogs(QtWidgets.QDialog):
                                   plug=True, socket=False, dataType=str)
 
         db = DatabaseQueries()
-        db.cursor.execute("INSERT INTO files (path, name, task, extension) VALUES ({}, {}, {}, {})".format(db_path, db_name, db_task, db_extension))
+        db.cursor.execute("INSERT INTO files (path, name, task, extension, filename) VALUES ({}, {}, {}, {}, {})".format(db_path, db_name, db_task, db_extension, db_filename))
+
+        self.close()
+
+
+class SubGraphDialogs(QtWidgets.QDialog):
+    """docstring for ClassName"""
+
+    def __init__(self, nodz, current_project, project_path):
+        super(SubGraphDialogs, self).__init__(nodz)
+
+        self.current_name = ""
+        self.type = 'subgraph'
+        self.nodz = nodz
+        self.path = project_path
+        self.project = current_project
+
+        self.setWindowTitle("AM")
+
+        main_font = QtGui.QFont()
+        main_font.setPointSize(10)
+        main_font.setFamily("Arial")
+
+        dialogs_layout = QtWidgets.QVBoxLayout(self)
+
+        path = "C:\Users\jucha\Documents\@git\icons\{}.png".format(self.type)
+        pixmap = QtGui.QPixmap(path)
+        icon = QtWidgets.QLabel()
+        icon.setPixmap(pixmap)
+        icon.setAlignment(QtCore.Qt.AlignCenter)
+        dialogs_layout.addWidget(icon)
+
+        sperator = QtWidgets.QFrame()
+        sperator.setFrameStyle(QtWidgets.QFrame.HLine | QtWidgets.QFrame.Plain)
+        sperator.setFixedHeight(1)
+        dialogs_layout.addWidget(sperator)
+
+        self.name = QtWidgets.QLineEdit()
+        self.name.setFont(main_font)
+        dialogs_layout.addWidget(self.name)
+
+        dialog_btn_layout = QtWidgets.QHBoxLayout(self)
+        dialogs_layout.addLayout(dialog_btn_layout)
+
+        ok_btn = QtWidgets.QPushButton("OK")
+        ok_btn.setFont(main_font)
+        ok_btn.clicked.connect(self.create_node)
+        dialog_btn_layout.addWidget(ok_btn)
+
+        cancel_btn = QtWidgets.QPushButton("Cancel")
+        cancel_btn.setFont(main_font)
+        cancel_btn.clicked.connect(self.close)
+        dialog_btn_layout.addWidget(cancel_btn)
+
+        self.show()
+
+    def create_node(self):
+
+        self.current_name = self.name.text()
+
+        json_path = self.path + '/subgraph/' + self.current_name + '.json'
+
+        self.nodz.saveGraph(json_path)
+        self.nodz.clearGraph()
+
+        db_name = "'{}'".format(self.current_name)
+        db_path = "'{}'".format(json_path)
+        db_project = "'{}'".format(self.project)
+
+        node = self.nodz.createNode(name='[SG] ' + self.current_name, preset='node_preset_5', position=None)
+
+        self.nodz.createAttribute(node=node, name='Output', index=-1, preset='attr_preset_1',
+                                  plug=True, socket=False, dataType=str)
+
+        db = DatabaseQueries()
+        db.cursor.execute("INSERT INTO subgraph (name, path, project) VALUES ({}, {}, {})".format(db_name, db_path, db_project))
 
         self.close()

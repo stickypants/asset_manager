@@ -65,7 +65,7 @@ class TreeWidget(QtWidgets.QWidget):
 
         self.tree.clear()
 
-        entity_type = ['character', 'props', 'set', 'sequence', 'shot', 'file']
+        entity_type = ['character', 'props', 'set', 'sequence', 'shot']
 
         project_item = QtWidgets.QTreeWidgetItem(['{}'.format(self.project_name)])
         self.tree.addTopLevelItem(project_item)
@@ -99,6 +99,17 @@ class TreeWidget(QtWidgets.QWidget):
                         file_item = QtWidgets.QTreeWidgetItem(['{}'.format('[F] ' + file[1])])
                         task_item.addChild(file_item)
 
+        subgraphs_item = QtWidgets.QTreeWidgetItem(['{}'.format('subgraphs')])
+        project_item.addChild(subgraphs_item)
+
+        db = DatabaseQueries()
+        db.cursor.execute("SELECT * FROM subgraph WHERE project = '{}'".format(self.project_name))
+        data = db.cursor.fetchall()
+
+        for graph in data:
+            graph_item = QtWidgets.QTreeWidgetItem(['{}'.format('[SG] ' + graph[0])])
+            subgraphs_item.addChild(graph_item)
+
         self.tree.expandAll()
 
     def create_node(self, item_name):
@@ -131,6 +142,13 @@ class TreeWidget(QtWidgets.QWidget):
 
             self.nodz.createAttribute(node=node, name='Input', index=-1, preset='attr_preset_1',
                                       plug=False, socket=True, dataType=str)
+
+            self.nodz.createAttribute(node=node, name='Output', index=-1, preset='attr_preset_1',
+                                      plug=True, socket=False, dataType=str)
+
+        if '[SG] ' in node_name:
+
+            node = self.nodz.createNode(name=node_name, preset='node_preset_5', position=None)
 
             self.nodz.createAttribute(node=node, name='Output', index=-1, preset='attr_preset_1',
                                       plug=True, socket=False, dataType=str)
