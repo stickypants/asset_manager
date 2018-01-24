@@ -23,10 +23,11 @@ from dialogs.project import NewProjectDialogs, ChooseProjectDialogs
 from dialogs.search_bar import SearchBarDialogs
 from dialogs.entity import EntityDialogs, FileDialogs, SubGraphDialogs
 
-from widgets.calendar import CalendarWidget
+from widgets.calendar import CalendarWidget, EventDialog
 from widgets.infos import InfoWidget
 from widgets.graph import AnalyticsWidget
 from widgets.library import TreeWidget
+from widgets.log import LogWidget
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -39,6 +40,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.selected_node = ''
         self.current_project_path = ''
         self.graph_history = 0
+        self.old_date = []
 
         self.main_font = QtGui.QFont()
         self.main_font.setPointSize(12)
@@ -112,6 +114,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.second_layout.addWidget(self.nodz)
 
         self.calendar = CalendarWidget()
+        self.calendar.event_btn.clicked.connect(self.create_new_event)
+        self.calendar.calendar.selectionChanged.connect(self.update_event_infos)
 
         self.infos = InfoWidget()
         self.infos.subgraph_btn.clicked.connect(self.load_subgraph_data)
@@ -120,6 +124,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.graph = AnalyticsWidget()
         self.tree = TreeWidget(self.nodz)
+        self.log = LogWidget()
 
         self.tab = QtWidgets.QTabWidget()
         self.tab.setFont(self.main_font)
@@ -129,6 +134,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.tab.addTab(self.tree, "Library")
         self.tab.addTab(self.calendar, "Calendar")
         self.tab.addTab(self.graph, "Graphs")
+        self.tab.addTab(self.log, "Log")
 
         self.second_layout.addWidget(self.tab)
 
@@ -202,9 +208,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
             self.infos.subgraph_btn.setEnabled(False)
             self.infos.snap_btn.setEnabled(False)
+            self.update_event_calendar()
 
             if '[E] ' in self.selected_node[0]:
-
 
                 node_name = "'{}'".format(self.selected_node[0][4:])
 
@@ -386,6 +392,88 @@ class MainWindow(QtWidgets.QMainWindow):
                                   plug=False, socket=True, dataType=str)
         self.nodz.createAttribute(node=node, name='Output', index=-1, preset='attr_preset_1',
                                   plug=True, socket=False, dataType=str)
+
+    def create_new_event(self):
+
+        d = EventDialog(self)
+        d.exec_()
+
+        task_status = d.status_combox.currentText()
+        event_message = d.event_infos.toPlainText()
+        selected_node = self.selected_node[0][4:]
+        project = self.current_project
+
+        color_dict = {'Waiting to Start': QtGui.QColor(239, 240, 241, 255),
+                      'In Progress': QtGui.QColor(243, 156, 18, 255),
+                      'To Review': QtGui.QColor(41, 128, 185, 255),
+                      'Retake': QtGui.QColor(192, 57, 43, 255),
+                      'Ok': QtGui.QColor(39, 174, 96, 255)}
+
+        current_date = self.calendar.calendar.selectedDate()
+        db_date = current_date.toString()
+
+        db = DatabaseQueries()
+        db.cursor.execute(
+            "INSERT INTO events (date, entity, status, message, project) VALUES (%s, %s, %s, %s, %s)", (db_date, selected_node, task_status, event_message, project))
+
+        event = QtGui.QTextCharFormat()
+        event.setFontPointSize(12)
+        event.setForeground(color_dict[task_status])
+        self.calendar.calendar.setDateTextFormat(current_date, event)
+
+    def update_event_calendar(self):
+
+        for date in self.old_date:
+
+            reset_color = QtGui.QTextCharFormat()
+            reset_color.setForeground(QtGui.QColor(255, 255, 255, 255))
+            self.calendar.calendar.setDateTextFormat(date, reset_color)
+
+        self.old_date = []
+
+        selected_node = self.selected_node[0][4:]
+        project = self.current_project
+
+        db = DatabaseQueries()
+        db.cursor.execute(
+            "SELECT * FROM events WHERE entity = '{}' AND project = '{}' ".format(selected_node, project))
+        data = db.cursor.fetchall()
+
+        for event in data:
+
+            current_date = event[0]
+            qdate = QtCore.QDate.fromString(current_date)
+
+            color_dict = {'Waiting to Start': QtGui.QColor(239, 240, 241, 255),
+                          'In Progress': QtGui.QColor(243, 156, 18, 255),
+                          'To Review': QtGui.QColor(41, 128, 185, 255),
+                          'Retake': QtGui.QColor(192, 57, 43, 255),
+                          'Ok': QtGui.QColor(39, 174, 96, 255)}
+
+            event_color = QtGui.QTextCharFormat()
+            event_color.setForeground(color_dict[event[2]])
+            self.calendar.calendar.setDateTextFormat(qdate, event_color)
+
+            self.old_date.append(qdate)
+
+    def update_event_infos(self):
+
+        selected_node = self.selected_node[0][4:]
+        project = self.current_project
+
+        current_date = self.calendar.calendar.selectedDate()
+        db_date = current_date.toString()
+
+        db = DatabaseQueries()
+        db.cursor.execute(
+            "SELECT * FROM events WHERE entity = '{}' AND project = '{}' AND date = '{}' ".format(selected_node, project, db_date))
+        data = db.cursor.fetchall()
+        try:
+            html = '<font color="#c0392b"><b>{}</b></font><p><i>{}</i> - <b>{}</b></p><p>{}</p>'.format(data[0][1], data[0][2], data[0][0], data[0][3])
+            self.calendar.event_infos.setHtml(html)
+        except:
+            self.calendar.event_infos.setHtml('')
+
 
 if __name__ == "__main__":
 

@@ -81,23 +81,3 @@ class InfoWidget(QtWidgets.QWidget):
         self.previous_graph_btn = QtWidgets.QPushButton("Previous Graph")
         self.previous_graph_btn.setFont(self.main_font)
         self.main_layout.addWidget(self.previous_graph_btn)
-
-        sperator = QtWidgets.QFrame()
-        sperator.setFrameStyle(QtWidgets.QFrame.HLine | QtWidgets.QFrame.Plain)
-        sperator.setFixedHeight(1)
-        self.main_layout.addWidget(sperator)
-
-        self.task_label = QtWidgets.QLabel("Task Status")
-        self.task_label.setFont(self.main_font)
-        self.task_label.setAlignment(QtCore.Qt.AlignLeft)
-        self.main_layout.addWidget(self.task_label)
-
-        self.status_combox = QtWidgets.QComboBox()
-        self.status_combox.setFont(self.main_font)
-        self.main_layout.addWidget(self.status_combox)
-
-        status_list = ['wts', 'ip', 'rev', 'rtk', 'fin']
-        status_name = ['Waiting to Start', 'In Progress', 'To Review', 'Retake', 'Ok']
-
-        for i, status in enumerate(status_list):
-            self.status_combox.addItem(QtGui.QIcon("C:/Users/jucha/Documents/@git/icons/{}.png".format(status)), status_name[i])

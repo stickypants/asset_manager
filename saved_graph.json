@@ -1,32 +1,24 @@
 {
     "CONNECTIONS": [
         [
-            "[T] test_demo_lookdev.Output", 
-            "[F] test_demo_lookdev_001 | blend.Input"
+            "[E] female_001.Output", 
+            "[T] female_001_modeling.Input"
         ], 
         [
-            "[T] test_demo_modeling.Output", 
-            "[F] test_demo_modeling_003 | blend.Input"
+            "[T] female_001_modeling.Output", 
+            "[F] female_001_modeling | ma.Input"
         ], 
         [
-            "[E] test_demo.Output", 
-            "[T] test_demo_modeling.Input"
+            "[E] female_001.Output", 
+            "[T] female_001_lookdev.Input"
         ], 
         [
-            "[E] test_demo.Output", 
-            "[T] test_demo_lookdev.Input"
-        ], 
-        [
-            "[T] test_demo_modeling.Output", 
-            "[F] test_demo_modeling_001 | blend.Input"
-        ], 
-        [
-            "[T] test_demo_modeling.Output", 
-            "[F] test_demo_modeling_002 | blend.Input"
+            "[T] female_001_lookdev.Output", 
+            "[F] female_001_lookdev | ma.Input"
         ]
     ], 
     "NODES": {
-        "[E] test_demo": {
+        "[E] female_001": {
             "alternate": true, 
             "attributes": [
                 {
@@ -45,12 +37,12 @@
                 }
             ], 
             "position": [
-                61.122656250000176, 
-                698.4656437500004
+                808.0, 
+                903.0
             ], 
             "preset": "node_preset_1"
         }, 
-        "[F] test_demo_lookdev_001 | blend": {
+        "[F] female_001_lookdev | ma": {
             "alternate": true, 
             "attributes": [
                 {
@@ -69,12 +61,12 @@
                 }
             ], 
             "position": [
-                779.4434999999991, 
-                1010.4117000000001
+                1462.0, 
+                1014.0
             ], 
             "preset": "node_preset_2"
         }, 
-        "[F] test_demo_modeling_001 | blend": {
+        "[F] female_001_modeling | ma": {
             "alternate": true, 
             "attributes": [
                 {
@@ -93,12 +85,12 @@
                 }
             ], 
             "position": [
-                767.3571787298387, 
-                556.5022688172044
+                1473.0, 
+                842.0
             ], 
             "preset": "node_preset_2"
         }, 
-        "[F] test_demo_modeling_002 | blend": {
+        "[T] female_001_lookdev": {
             "alternate": true, 
             "attributes": [
                 {
@@ -117,60 +109,12 @@
                 }
             ], 
             "position": [
-                767.1227614247306, 
-                711.6736217405913
-            ], 
-            "preset": "node_preset_2"
-        }, 
-        "[F] test_demo_modeling_003 | blend": {
-            "alternate": true, 
-            "attributes": [
-                {
-                    "dataType": "<type 'str'>", 
-                    "name": "Input", 
-                    "plug": false, 
-                    "preset": "attr_preset_1", 
-                    "socket": true
-                }, 
-                {
-                    "dataType": "<type 'str'>", 
-                    "name": "Output", 
-                    "plug": true, 
-                    "preset": "attr_preset_1", 
-                    "socket": false
-                }
-            ], 
-            "position": [
-                772.4474749999996, 
-                861.7461687499995
-            ], 
-            "preset": "node_preset_2"
-        }, 
-        "[T] test_demo_lookdev": {
-            "alternate": true, 
-            "attributes": [
-                {
-                    "dataType": "<type 'str'>", 
-                    "name": "Input", 
-                    "plug": false, 
-                    "preset": "attr_preset_1", 
-                    "socket": true
-                }, 
-                {
-                    "dataType": "<type 'str'>", 
-                    "name": "Output", 
-                    "plug": true, 
-                    "preset": "attr_preset_1", 
-                    "socket": false
-                }
-            ], 
-            "position": [
-                338.95967103494627, 
-                801.0640157594091
+                1154.0, 
+                1023.0
             ], 
             "preset": "node_preset_3"
         }, 
-        "[T] test_demo_modeling": {
+        "[T] female_001_modeling": {
             "alternate": true, 
             "attributes": [
                 {
@@ -189,8 +133,8 @@
                 }
             ], 
             "position": [
-                336.56717096774173, 
-                657.0494271841403
+                1157.0, 
+                851.0
             ], 
             "preset": "node_preset_3"
         }
